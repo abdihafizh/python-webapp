@@ -16,15 +16,14 @@ pipeline {
         stage('Setup Virtual Environment') {
             steps {
                 sh 'python3 -m venv venv'
-                sh 'source venv/bin/activate'
-                sh 'pip install --upgrade pip'
-                sh 'pip install -r requirements.txt'
+                sh 'bash -c "source venv/bin/activate && pip install --upgrade pip"'
+                sh 'bash -c "source venv/bin/activate && pip install -r requirements.txt"'
             }
         }
 
         stage('Run Tests') {
             steps {
-                sh 'source venv/bin/activate && pytest --junitxml=report.xml'
+                sh 'bash -c "source venv/bin/activate && pytest --junitxml=report.xml"'
             }
         }
 
@@ -36,7 +35,7 @@ pipeline {
                       -Dsonar.projectKey=jenkins-cicd \
                       -Dsonar.sources=. \
                       -Dsonar.host.url=${SONARQUBE_URL} \
-                      -Dsonar.login=sqp_b6b0ee93d5c691f267fc927013c0fee4ee27e055
+                      -Dsonar.login=${SONAR_AUTH_TOKEN}
                     '''
                 }
             }
@@ -44,7 +43,7 @@ pipeline {
 
         stage('Deploy') {
             steps {
-                sh 'source venv/bin/activate && nohup python3 app.py &'
+                sh 'bash -c "source venv/bin/activate && nohup python3 app.py &"'
             }
         }
     }
